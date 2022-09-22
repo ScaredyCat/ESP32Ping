@@ -244,7 +244,7 @@ static void stop_action(int i) {
 * Operation functions
 *
 */
-void ping(const char *name, int count, int interval, int size, int timeout) {
+void ping(const char *name, int count, int interval=0, int size=0, int timeout=0) {
     // Resolve name
     hostent * target = gethostbyname(name);
     IPAddress adr = *target->h_addr_list[0];
@@ -297,8 +297,15 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
     struct timeval tout;
 
     // Timeout
-    tout.tv_sec = timeout;
-    tout.tv_usec = 0;
+    #ifdef TIME_UNIT_MILLIS
+        tout.tv_sec = 0;
+        tout.tv_usec = timeout*1000L;
+    #else
+        tout.tv_sec = timeout;
+        tout.tv_usec = 0;
+    #endif
+
+
 
     if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &tout, sizeof(tout)) < 0) {
         closesocket(s);
@@ -331,7 +338,11 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
             ping_recv(s);
         }
         if(ping_seq_num < count){
-            delay( interval*1000L);
+#ifdef TIME_UNIT_MILLIS
+            delay(interval);
+#else
+            delay(interval*1000L);
+#endif
         }
     }
 

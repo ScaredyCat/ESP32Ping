@@ -53,6 +53,7 @@ public:
     bool ping(const char *host, byte count = 5);
 
     float averageTime();
+    unsigned int errors();
 
 protected:
     static void _ping_sent_cb(void *opt, void *pdata);

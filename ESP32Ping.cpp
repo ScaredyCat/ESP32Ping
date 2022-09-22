@@ -44,14 +44,14 @@ bool PingClass::ping(IPAddress dest, byte count) {
     _options.recv_function = reinterpret_cast<ping_recv_function>(&PingClass::_ping_recv_cb);
     _options.sent_function = NULL; //reinterpret_cast<ping_sent_function>(&_ping_sent_cb);
 
-    
+
     // Suspend till the process end
     esp_yield(); // ????????? Where should this be placed?
-    
+
     // Let's go!
     ping_start(&_options); // Here we do all the work
 
-    // Returns true if at least 1 ping had a pong response 
+    // Returns true if at least 1 ping had a pong response
     return (_success > 0); //_success variable is changed by the callback function
 }
 
@@ -68,6 +68,12 @@ float PingClass::averageTime() {
     return _avg_time;
 }
 
+unsigned int PingClass::errors() {
+    return _errors;
+}
+
+
+
 void PingClass::_ping_recv_cb(void *opt, void *resp) {
     // Cast the parameters to get some usable info
     ping_resp *ping_resp = reinterpret_cast<struct ping_resp *>(resp);
@@ -77,7 +83,7 @@ void PingClass::_ping_recv_cb(void *opt, void *resp) {
     _errors = ping_resp->timeout_count;
     _success = ping_resp->total_count - ping_resp->timeout_count;
     _avg_time = ping_resp->resp_time;
-    
+
 
     // Some debug info
     DEBUG_PING(
@@ -97,10 +103,10 @@ void PingClass::_ping_recv_cb(void *opt, void *resp) {
 
     // Is it time to end?
     DEBUG_PING("Avg resp time %f ms\n", _avg_time);
-    
+
     // Done, return to main function
     esp_schedule();
-    
+
     // just a check ...
     if (_success + _errors != _expected_count) {
         DEBUG_PING("Something went wrong: _success=%d and _errors=%d do not sum up to _expected_count=%d\n",_success, _errors, _expected_count );

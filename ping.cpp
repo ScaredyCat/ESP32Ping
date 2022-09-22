@@ -137,7 +137,7 @@ static err_t ping_send(int s, ip4_addr_t *addr, int size) {
 
     iecho = (struct icmp_echo_hdr *)mem_malloc((mem_size_t)ping_size);
     if (!iecho) {
-	mem_free(iecho);    
+	mem_free(iecho);
         return ERR_MEM;
     }
 
@@ -321,10 +321,10 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
     char ipa[16];
 
     strcpy(ipa, inet_ntoa(ping_target));
-    log_i("PING %s: %d data bytes\r\n",  ipa, size);
+    log_d("PING %s: %d data bytes\r\n",  ipa, size);
 
     ping_seq_num = 0;
-    
+
     unsigned long ping_started_time = millis();
     while ((ping_seq_num < count) && (!stopped)) {
         if (ping_send(s, &ping_target, size) == ERR_OK) {
@@ -337,16 +337,16 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
 
     closesocket(s);
 
-    log_i("%d packets transmitted, %d packets received, %.1f%% packet loss\r\n",
+    log_d("%d packets transmitted, %d packets received, %.1f%% packet loss\r\n",
           transmitted,
           received,
           ((((float)transmitted - (float)received) / (float)transmitted) * 100.0)
     );
-    
-    
+
+
     if (ping_o) {
         ping_resp pingresp;
-        log_i("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\r\n", min_time, mean_time, max_time, sqrt(var_time / received));
+        log_d("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\r\n", min_time, mean_time, max_time, sqrt(var_time / received));
         pingresp.total_count = count; //Number of pings
         pingresp.resp_time = mean_time; //Average time for the pings
         pingresp.seqno = 0; //not relevant
@@ -358,8 +358,8 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
         // Call the callback function
         ping_o->recv_function(ping_o, &pingresp);
     }
-    
-    // Return true if at least one ping had a successfull "pong" 
+
+    // Return true if at least one ping had a successfull "pong"
     return (received > 0);
 }
 

@@ -18,7 +18,6 @@
 */
 #include "ESP32Ping.h"
 
-
 extern "C" void esp_schedule(void) {};
 extern "C" void esp_yield(void) {};
 
@@ -72,8 +71,6 @@ unsigned int PingClass::errors() {
     return _errors;
 }
 
-
-
 void PingClass::_ping_recv_cb(void *opt, void *resp) {
     // Cast the parameters to get some usable info
     ping_resp *ping_resp = reinterpret_cast<struct ping_resp *>(resp);
@@ -83,7 +80,6 @@ void PingClass::_ping_recv_cb(void *opt, void *resp) {
     _errors = ping_resp->timeout_count;
     _success = ping_resp->total_count - ping_resp->timeout_count;
     _avg_time = ping_resp->resp_time;
-
 
     // Some debug info
     DEBUG_PING(
